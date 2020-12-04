@@ -41,7 +41,7 @@ NO *criarNo(){ // criando um no pela primeira vez
     // 
 
 
-    for(int i = 0; i < MAX;i++){ // como ele é um novo nó, então ele não tem filhos, dessa forma os elementos do vetor de filhos recebem NULL;
+    for(int i = 0; i < MAX+1;i++){ // como ele é um novo nó, então ele não tem filhos, dessa forma os elementos do vetor de filhos recebem NULL;
         novo_no->filhos[i] = NULL;
     }
 
@@ -66,77 +66,157 @@ void inserirNo(NO *no,int num){
     no->num_chaves++;
 }
 
-// ***********************    Rotações    *********************** //
-NO *split1(NO *no){ // ira dividir o nó em outras duas ramificações quando o nó estiver cheio de chaves   
-     
-    NO *novo_no = criarNo();  // criando o novo nó depois de efetuar a divisão/quebra
-    inserirNo(novo_no,no->chaves[1]);
 
-    NO *filho_esq = criarNo(); // criando o filho esquerdo do novo no
-    inserirNo(filho_esq,no->chaves[0]);
-    filho_esq->filhos[0] = no->filhos[0]; // atualizando os filhos
-    filho_esq->filhos[1] = no->filhos[1];
 
-    NO *filho_dir = criarNo(); // criando o filho direito do novo no
-    inserirNo(filho_dir,no->chaves[2]);
-    filho_dir->filhos[0] = no->filhos[2];
-    filho_dir->filhos[1] = no->filhos[3];
 
-    novo_no->filhos[0] = filho_esq;
-    novo_no->filhos[1] = filho_dir;    
 
-    free(no);
+int raizTemFilho(NO *raiz){  // verifica se a raiz tem filho 
+    int flag = 0;
+    for(int i = 0; i < MAX; i++){
+        if(raiz->filhos[i]!=NULL){
+            flag = 1;
+            break;
+        }   
+    }
+    return flag;
+}
 
-    return novo_no;  
+NO *split1(NO *raiz){
+
+    NO *filho_esq = criarNo();
+        inserirNo(filho_esq,raiz->chaves[0]);
+        filho_esq->filhos[0] = raiz->filhos[0];
+         filho_esq->filhos[1] = raiz->filhos[1];
+
+        NO *filho_dir = criarNo();
+        inserirNo(filho_dir,raiz->chaves[2]);
+        filho_dir->filhos[0] = raiz->filhos[2];
+        filho_dir->filhos[1] = raiz->filhos[3];
+
+        NO *nova_raiz = criarNo();
+        inserirNo(nova_raiz,raiz->chaves[1]);
+        nova_raiz->filhos[0]=filho_esq;
+        nova_raiz->filhos[1]=filho_dir;
+
+        free(raiz);
+        return nova_raiz;
+}
+
+NO *split2(NO *raiz){  // raiz tem um único elemento e estamos inserindo a esquerda
+ 
+
+
+    NO *filho_esq = criarNo();          // criando o filho a esquerda
+    inserirNo(filho_esq,raiz->filhos[0]->chaves[0]);
+    filho_esq->filhos[0] = raiz->filhos[0]->filhos[0];
+    filho_esq->filhos[1] = raiz->filhos[0]->filhos[1];
+
+    NO *filho_meio= criarNo();          // criando o filho do meio
+    inserirNo(filho_meio,raiz->chaves[2]);
+    filho_meio->filhos[0]=raiz->filhos[0]->filhos[2];
+    filho_meio->filhos[1]=raiz->filhos[0]->filhos[3];
+
+    inserirNo(raiz,raiz->filhos[0]->chaves[1]);
+    free(raiz->filhos[0]);
+    raiz->filhos[0] = filho_esq;
+    raiz->filhos[2] = raiz->filhos[1];  
+    raiz->filhos[1] = filho_meio;
+
+
+    return raiz;
+}
+
+NO *split3(NO *raiz){ // raiz tem apenas uma unica chave e possui um filho com 3 chaves maiores que o da raiz
+    NO *filho_meio = criarNo();
+    inserirNo(filho_meio,raiz->filhos[1]->chaves[0]);
+    filho_meio->filhos[0]=raiz->filhos[1]->filhos[0];
+    filho_meio->filhos[1]=raiz->filhos[1]->filhos[1];
+
+    NO *filho_dir = criarNo();
+    inserirNo(filho_dir,raiz->filhos[1]->chaves[2]); 
+    filho_dir->filhos[0]=raiz->filhos[1]->filhos[2];
+    filho_dir->filhos[1]=raiz->filhos[1]->filhos[3];
+
+    inserirNo(raiz,raiz->filhos[1]->chaves[1]);
+
+    raiz->filhos[1] = filho_meio;
+    raiz->filhos[2] = filho_dir;
+
+    return raiz;
+
 }
 
 
+NO *split4(NO *raiz){ //raiz com duas chaves e com um filho seu filho mais a esquerda com três chaves 
 
+    NO *filho_esq=criarNo();
+    inserirNo(filho_esq,raiz->filhos[0]->chaves[0]);
+    filho_esq->filhos[0]=raiz->filhos[0]->filhos[0];
+    filho_esq->filhos[1]=raiz->filhos[0]->filhos[1];
 
+    NO *filho_esq2=criarNo();
+    inserirNo(filho_esq2,raiz->filhos[0]->chaves[2]);
+    filho_esq2->filhos[0]=raiz->filhos[0]->filhos[2];
+    filho_esq2->filhos[1]=raiz->filhos[0]->filhos[3];
 
+    inserirNo(raiz,raiz->filhos[0]->chaves[1]);
 
+    return raiz;
+}
 
 NO *inserirArvore(NO *raiz, int num){
 
-    if(raiz == NULL){  // caso a raíz seja nula, como será uma chamada recursiva, irá verificar também se a sub-árvore é nula também
-        NO *novo_no = criarNo(); // criando um novo nó     
-        inserirNo(novo_no,num); // inserindo o elemento no novo nó           
-        return novo_no;  // retornando o nó
+    if(raiz == NULL){  // caso a raiz/nó for nulo, irá criar uma raiz/nó nova
+
+        NO *raiz_nova=criarNo();
+        inserirNo(raiz_nova,num);
+
+        return raiz_nova;
     }
-    else if(raiz->num_chaves < MAX){ // irá preencher  a raiz/ nó enquanto ele não estiver cheio
-        
-        if(numeroRepetido(raiz->chaves,raiz->num_chaves,num) == false){  // ele só vai inserir um elemento caso ele não esteja no nó 
-            inserirNo(raiz,num); 
-        }
-        if(raiz->num_chaves == MAX){
-            raiz = split1(raiz);
+    if(raizTemFilho(raiz)==false && raiz->num_chaves < 3){
+        if(numeroRepetido(raiz->chaves,raiz->num_chaves,num) == false){ // caso esse número não seja repetido ele será inserido
+            inserirNo(raiz,num);
         }
         return raiz;
-
-    }else{
-       
-       
-        int contador = 0; // esse variável irá nos dizer em que filho devemos inserir o novo número após o nó pai ficar cheio 
+    }if(raizTemFilho(raiz)==true || raiz->num_chaves==3){ // se a raiz/nó tem filho ou já está lotado de chaves
         
-        while(num > raiz->chaves[contador] && contador<=MAX){
-            contador++;
+        if(raiz->num_chaves == 3){ // irá fazer a divisão quando a raiz fica cheia
+           raiz = split1(raiz);
         }
-        return raiz;
+        
+        int indice_filho = 0;
+        while( indice_filho < raiz->num_chaves && num > raiz->chaves[indice_filho]){
+            indice_filho++;
+        }
+        if(raiz->filhos[indice_filho]->num_chaves==3 && raizTemFilho(raiz->filhos[indice_filho])==false){
+            if(raiz->num_chaves == 1 && indice_filho == 1){
+                raiz = split3(raiz);
+                raiz = inserirArvore(raiz,num);
+            }
+        }else{
+            raiz->filhos[indice_filho] = inserirArvore(raiz->filhos[indice_filho],num);
+        }
+        
     }
 
+
+
+
+    return raiz;
 }
 
 
 int main(){
     NO *raiz = NULL; // raiz da árvore
     
-    raiz = inserirArvore(raiz,3);
-    raiz = inserirArvore(raiz,5);
-    raiz = inserirArvore(raiz,2);
-    
-    
-    for(int i = 0 ; i < raiz->num_chaves;i++){
-        printf("%d ",raiz->chaves[i]);
-    };
-   
+    raiz = inserirArvore(raiz,60);
+    raiz = inserirArvore(raiz,30);
+    raiz = inserirArvore(raiz,10);
+    raiz = inserirArvore(raiz,20);
+    raiz = inserirArvore(raiz,50);
+    raiz = inserirArvore(raiz,40);
+    raiz = inserirArvore(raiz,70);
+    raiz = inserirArvore(raiz,80);
+    raiz = inserirArvore(raiz,41);
+    printf("%d",raiz->filhos[1]->chaves[0]);
 }  
