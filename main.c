@@ -35,13 +35,10 @@ struct no{
 NO *criarNo(){ // criando um no pela primeira vez
     
     // alocando espaço na memoria para novo nó
-    NO *novo_no = malloc(sizeof(NO));
+    NO *novo_no = (NO*)malloc(sizeof(NO));
     novo_no->num_chaves = 0;
-    novo_no->filhos[MAX+1] = malloc((MAX+1)*sizeof(NO));
-    // 
-
-
-    for(int i = 0; i < MAX+1;i++){ // como ele é um novo nó, então ele não tem filhos, dessa forma os elementos do vetor de filhos recebem NULL;
+  
+    for(int i = 0; i <= MAX;i++){ // como ele é um novo nó, então ele não tem filhos, dessa forma os elementos do vetor de filhos recebem NULL;
         novo_no->filhos[i] = NULL;
     }
 
@@ -164,11 +161,47 @@ NO *split4(NO *raiz){ //raiz com duas chaves e com um filho  mais a esquerda com
     raiz->filhos[2]=raiz->filhos[1];
     raiz->filhos[1]=filho_esq2;
     raiz->filhos[0]=filho_esq;
+    
     return raiz;
 }
 
 NO *split5(NO *raiz){ //
+  NO *filho_esq2=criarNo();
+  inserirNo(filho_esq2,raiz->filhos[1]->chaves[0]);
+  filho_esq2->filhos[0]=raiz->filhos[1]->filhos[0];
+  filho_esq2->filhos[1]=raiz->filhos[1]->filhos[1];
 
+  NO *filho_dir2=criarNo();
+  inserirNo(filho_dir2,raiz->filhos[1]->chaves[2]);
+  filho_dir2->filhos[0]=raiz->filhos[1]->filhos[2];
+  filho_dir2->filhos[1]=raiz->filhos[1]->filhos[3];
+
+  inserirNo(raiz,raiz->filhos[1]->chaves[1]);
+
+  raiz->filhos[3]=raiz->filhos[2];
+  raiz->filhos[2]=filho_dir2;
+  raiz->filhos[1]=filho_esq2;
+
+  return  raiz;
+}
+
+NO *split6(NO *raiz){ // raiz com duas chaves filho a direita cheio
+  
+  NO *filho_dir2=criarNo();
+  inserirNo(filho_dir2,raiz->filhos[2]->chaves[0]);
+  filho_dir2->filhos[0]=raiz->filhos[2]->filhos[0];
+  filho_dir2->filhos[1]=raiz->filhos[2]->filhos[1];
+
+  NO *filho_dir1=criarNo();
+  inserirNo(filho_dir1,raiz->filhos[2]->chaves[2]);
+  filho_dir2->filhos[0]=raiz->filhos[2]->filhos[2];
+  filho_dir2->filhos[1]=raiz->filhos[2]->filhos[3];
+
+  inserirNo(raiz,raiz->filhos[2]->chaves[1]);
+  raiz->filhos[2]=filho_dir2;
+  raiz->filhos[3]=filho_dir1;
+
+  return raiz;
 }
 
 NO *inserirArvore(NO *raiz, int num){
@@ -195,26 +228,43 @@ NO *inserirArvore(NO *raiz, int num){
         while( indice_filho < raiz->num_chaves && num > raiz->chaves[indice_filho]){
             indice_filho++;
         }
+
         if(raiz->filhos[indice_filho]->num_chaves==3 && raizTemFilho(raiz->filhos[indice_filho])==false){
             if(raiz->num_chaves == 1 && indice_filho == 1){
                 raiz = split3(raiz);
                 raiz = inserirArvore(raiz,num);
             }
+            else if(raiz->num_chaves == 1 && indice_filho == 0){
+                raiz = split2(raiz);
+                raiz = inserirArvore(raiz,num);
+            }
+            else if(raiz->num_chaves == 2 && indice_filho == 0){
+                raiz = split4(raiz);
+                raiz = inserirArvore(raiz,num);
+
+            }
+            else if(raiz->num_chaves == 2 && indice_filho == 1){
+                raiz = split5(raiz);
+                raiz = inserirArvore(raiz,num);
+            }
+            else if(raiz->num_chaves == 2 && indice_filho == 2){
+                raiz = split6(raiz);
+                raiz = inserirArvore(raiz,num);
+                
+            }
+      
         }else{
             raiz->filhos[indice_filho] = inserirArvore(raiz->filhos[indice_filho],num);
         }
         
     }
 
-
-
-
     return raiz;
 }
 
 
 int main(){
-    NO *raiz = NULL; // raiz da árvore
+    NO *raiz = criarNo(); // raiz da árvore
     
     raiz = inserirArvore(raiz,60);
     raiz = inserirArvore(raiz,30);
@@ -223,7 +273,15 @@ int main(){
     raiz = inserirArvore(raiz,50);
     raiz = inserirArvore(raiz,40);
     raiz = inserirArvore(raiz,70);
-    raiz = inserirArvore(raiz,80);
-    raiz = inserirArvore(raiz,41);
-    printf("%d",raiz->filhos[1]->chaves[0]);
+    raiz = inserirArvore(raiz,80);  
+    raiz = inserirArvore(raiz,15); //funcionando como deveria até aqui
+    raiz = inserirArvore(raiz,90);
+    raiz = inserirArvore(raiz,100);
+    raiz = inserirArvore(raiz,200);
+    printf("raiz: ");
+    for(int i=0;i<raiz->num_chaves;i++){
+      printf("%d ",raiz->chaves[i]);
+    }
+    printf("elemento especifico: ");
+    printf("%d",raiz->filhos[1]->filhos[0]->chaves[0]);
 }  
