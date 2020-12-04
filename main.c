@@ -6,6 +6,7 @@ Curso: ENGENHARIA DA COMPUTAÇÃO
 
 #include "stdio.h"
 #include "stdlib.h"
+#include "time.h"
 
 #define MAX 3  // número max de chaves
 #define true 1
@@ -261,27 +262,27 @@ NO *inserirArvore(NO *raiz, int num){
 
     return raiz;
 }
-
+void imprimirArvore(NO *raiz, int nivel){
+  if(raiz == NULL){
+    return ;
+  }
+  for(int i=0;i<raiz->num_chaves;i++){
+    imprimirArvore(raiz->filhos[i],nivel+1);
+    printf("Nivel: %d|",nivel);
+    printf("Pos: %d| %d \n",i,raiz->chaves[i]);
+  }
+  printf("\n");
+  imprimirArvore((raiz->filhos[raiz->num_chaves]),nivel+1);
+}
 
 int main(){
-    NO *raiz = criarNo(); // raiz da árvore
-    
-    raiz = inserirArvore(raiz,60);
-    raiz = inserirArvore(raiz,30);
-    raiz = inserirArvore(raiz,10);
-    raiz = inserirArvore(raiz,20);
-    raiz = inserirArvore(raiz,50);
-    raiz = inserirArvore(raiz,40);
-    raiz = inserirArvore(raiz,70);
-    raiz = inserirArvore(raiz,80);  
-    raiz = inserirArvore(raiz,15); //funcionando como deveria até aqui
-    raiz = inserirArvore(raiz,90);
-    raiz = inserirArvore(raiz,100);
-    raiz = inserirArvore(raiz,200);
-    printf("raiz: ");
-    for(int i=0;i<raiz->num_chaves;i++){
-      printf("%d ",raiz->chaves[i]);
-    }
-    printf("elemento especifico: ");
-    printf("%d",raiz->filhos[1]->filhos[0]->chaves[0]);
+  NO *raiz = criarNo(); // raiz da árvore
+  srand(time(NULL));
+
+  for(int i = 0; i<300;i++){
+    int num = 1 + rand() % 9999;
+    raiz = inserirArvore(raiz,num);
+  }
+   
+  imprimirArvore(raiz,0);
 }  
