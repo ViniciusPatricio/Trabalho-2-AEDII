@@ -147,7 +147,7 @@ NO *split3(NO *raiz){ // raiz tem apenas uma unica chave e possui um filho com 3
 }
 
 
-NO *split4(NO *raiz){ //raiz com duas chaves e com um filho seu filho mais a esquerda com três chaves 
+NO *split4(NO *raiz){ //raiz com duas chaves e com um filho  mais a esquerda com três chaves 
 
     NO *filho_esq=criarNo();
     inserirNo(filho_esq,raiz->filhos[0]->chaves[0]);
@@ -160,8 +160,15 @@ NO *split4(NO *raiz){ //raiz com duas chaves e com um filho seu filho mais a esq
     filho_esq2->filhos[1]=raiz->filhos[0]->filhos[3];
 
     inserirNo(raiz,raiz->filhos[0]->chaves[1]);
-
+    raiz->filhos[3]=raiz->filhos[2];
+    raiz->filhos[2]=raiz->filhos[1];
+    raiz->filhos[1]=filho_esq2;
+    raiz->filhos[0]=filho_esq;
     return raiz;
+}
+
+NO *split5(NO *raiz){ //
+
 }
 
 NO *inserirArvore(NO *raiz, int num){
