@@ -84,7 +84,7 @@ NO *split1(NO *raiz){
     NO *filho_esq = criarNo();
         inserirNo(filho_esq,raiz->chaves[0]);
         filho_esq->filhos[0] = raiz->filhos[0];
-         filho_esq->filhos[1] = raiz->filhos[1];
+        filho_esq->filhos[1] = raiz->filhos[1];
 
         NO *filho_dir = criarNo();
         inserirNo(filho_dir,raiz->chaves[2]);
@@ -110,7 +110,7 @@ NO *split2(NO *raiz){  // raiz tem um único elemento e estamos inserindo a esqu
     filho_esq->filhos[1] = raiz->filhos[0]->filhos[1];
 
     NO *filho_meio= criarNo();          // criando o filho do meio
-    inserirNo(filho_meio,raiz->chaves[2]);
+    inserirNo(filho_meio,raiz->filhos[0]->chaves[2]);
     filho_meio->filhos[0]=raiz->filhos[0]->filhos[2];
     filho_meio->filhos[1]=raiz->filhos[0]->filhos[3];
 
@@ -229,7 +229,7 @@ NO *inserirArvore(NO *raiz, int num){
         while( indice_filho < raiz->num_chaves && num > raiz->chaves[indice_filho]){
             indice_filho++;
         }
-
+        if(numeroRepetido(raiz->filhos[indice_filho]->chaves, raiz->filhos[indice_filho]->num_chaves, num)==false){
         if(raiz->filhos[indice_filho]->num_chaves==3 && raizTemFilho(raiz->filhos[indice_filho])==false){
             if(raiz->num_chaves == 1 && indice_filho == 1){
                 raiz = split3(raiz);
@@ -257,10 +257,19 @@ NO *inserirArvore(NO *raiz, int num){
         }else{
             raiz->filhos[indice_filho] = inserirArvore(raiz->filhos[indice_filho],num);
         }
-        
+      }else{
+        return  raiz;
+      }
     }
 
     return raiz;
+}
+
+void imprimirChaves(NO *raiz){
+  for(int i = 0;i<raiz->num_chaves;i++){
+    printf("%d ",raiz->chaves[i]);
+  }
+   printf("\n");
 }
 void imprimirArvore(NO *raiz, int nivel){
   if(raiz == NULL){
@@ -275,14 +284,27 @@ void imprimirArvore(NO *raiz, int nivel){
   imprimirArvore((raiz->filhos[raiz->num_chaves]),nivel+1);
 }
 
+void imprimirArvore2(NO *raiz){
+  if(raiz==NULL){
+    return;
+  }
+  int i;
+  for(i = 0; i<raiz->num_chaves;i++){
+    imprimirArvore2(raiz->filhos[i]);
+    printf("%d",raiz->chaves[i]);
+  }
+  imprimirArvore2(raiz->filhos[raiz->num_chaves]);
+}
+
 int main(){
   NO *raiz = criarNo(); // raiz da árvore
   srand(time(NULL));
 
-  for(int i = 0; i<300;i++){
-    int num = 1 + rand() % 9999;
-    raiz = inserirArvore(raiz,num);
+  for(int i = 0;i<300;i++){
+    int num = 1+(rand() % 9000);
+    
+    raiz=inserirArvore(raiz,num);
   }
-   
-  imprimirArvore(raiz,0);
+  
+  imprimirArvore2(raiz);
 }  
